@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>App Trắc Nghiệm Có Đáp Án</title>
+<style>
+body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
+.card { border: 1px solid #ddd; padding: 15px; border-radius: 10px; }
+.option { display:block; margin:8px 0; }
+button { margin: 5px; padding: 10px; cursor: pointer; }
+.result { font-weight:bold; margin-top:10px; }
+.answerBox { background:#f7f7f7; padding:10px; margin-top:10px; border-radius:8px; display:none; }
+.correct { color:green; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<h2>📘 Trắc Nghiệm Điện (Có đáp án)</h2>
+
+<div class="card">
+  <div id="question"></div>
+  <div id="options"></div>
+
+  <button onclick="prevQ()">⬅ Trước</button>
+  <button onclick="nextQ()">Tiếp ➡</button>
+  <button onclick="submit()">📊 Nộp bài</button>
+  <button onclick="showAnswer()">📖 Xem đáp án</button>
+
+  <div class="answerBox" id="answerBox"></div>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+
+const data = [
+{
+q:"Trạng thái 'Dự phòng nguội' là gì?",
+a:{A:"Máy cắt mở, dao cách ly mở",B:"Máy cắt đóng",C:"Có điện nhưng không tải",D:"Sấy nóng"},
+correct:"A"
+},
+{
+q:"Trạng thái 'Dự phòng nóng' là gì?",
+a:{A:"Đang vận hành",B:"Bảo trì",C:"Có điện nhưng không vận hành, dao đóng MC mở",D:"Sự cố"},
+correct:"C"
+},
+{
+q:"Cấp điện vượt khu chính tuyến cần làm gì?",
+a:{A:"HSCB1 mở",B:"HSCB2 mở",C:"TBCB vận hành",D:"Tất cả"},
+correct:"D"
+},
+{
+q:"Thiết bị cấp điện vượt khu?",
+a:{A:"HSCB1",B:"HSCB2",C:"DCL PCC",D:"TBCB"},
+correct:"D"
+},
+{
+q:"Điều kiện cấp điện vượt khu?",
+a:{A:"HSCB1 mở HSCB2 đóng",B:"ngược lại",C:"cả hai mở",D:"cả hai đóng"},
+correct:"C"
+},
+{
+q:"WSCB điều kiện?",
+a:{A:"WTCB1 rack out + WTCB2 rack in",B:"cả 2 rack out",C:"HSCB rack in",D:"khác"},
+correct:"A"
+},
+{
+q:"ECO mất điện 2 phân khu?",
+a:{A:"Ga 1 & 5",B:"2 & 6",C:"3 & 7",D:"4 & 8"},
+correct:"A"
+},
+{
+q:"ECO cần reset SCADA?",
+a:{A:"Ga 1,3,5,7",B:"2,4,6,8",C:"Tất cả"},
+correct:"B"
+},
+{
+q:"Mất điện 400V máy phát cấp?",
+a:{A:"ACB1",B:"ACB2",C:"ACB-G",D:"ACB-L"},
+correct:"C"
+},
+{
+q:"Điện áp thấp rơle?",
+a:{A:"33",B:"27",C:"50",D:"51"},
+correct:"B"
+}
+];
+
+let idx = 0;
+let answers = {};
+
+function show(){
+  let q = data[idx];
+  document.getElementById("question").innerHTML =
+    `<h3>${idx+1}. ${q.q}</h3>`;
+
+  let html = "";
+  for(let k in q.a){
+    html += `
+      <label class="option">
+        <input type="radio" name="opt" value="${k}" ${answers[idx]==k?"checked":""}>
+        <b>${k}:</b> ${q.a[k]}
+      </label>`;
+  }
+
+  document.getElementById("options").innerHTML = html;
+  document.getElementById("answerBox").style.display = "none";
+}
+
+function save(){
+  let opt = document.querySelector('input[name="opt"]:checked');
+  if(opt) answers[idx] = opt.value;
+}
+
+function nextQ(){
+  save();
+  if(idx < data.length-1) idx++;
+  show();
+}
+
+function prevQ(){
+  save();
+  if(idx > 0) idx--;
+  show();
+}
+
+function submit(){
+  save();
+  let score = 0;
+  data.forEach((q,i)=>{
+    if(answers[i] == q.correct) score++;
+  });
+
+  document.getElementById("result").innerHTML =
+    `🎯 Điểm: ${score}/${data.length}`;
+}
+
+function showAnswer(){
+  let q = data[idx];
+  let html = `<h4>📖 Đáp án đúng: <span class="correct">${q.correct}</span></h4>`;
+  html += `<p>${q.q}</p>`;
+
+  for(let k in q.a){
+    if(k == q.correct){
+      html += `<p class="correct">${k}: ${q.a[k]} ✔</p>`;
+    } else {
+      html += `<p>${k}: ${q.a[k]}</p>`;
+    }
+  }
+
+  let box = document.getElementById("answerBox");
+  box.innerHTML = html;
+  box.style.display = "block";
+}
+
+show();
+
+</script>
+
+</body>
+</html>
